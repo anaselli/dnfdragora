@@ -586,59 +586,55 @@ class mainGui(dnfdragora.basedragora.BaseDragora):
         self.quitButton.setWeight(0,3)
 
         ### BEGIN Menus #########################
-        if (hasattr(self.mgaFactory, 'createMenuBar') and ismethod(getattr(self.mgaFactory, 'createMenuBar'))):
+        if (hasattr(self.factory, 'createMenuBar') and ismethod(getattr(self.factory, 'createMenuBar'))):
             logger.info("System has createMenuBar, using menubar")
-            self.menubar = self.mgaFactory.createMenuBar(hbox_menubar)
+            self.menubar = self.factory.createMenuBar(hbox_menubar)
 
             # building File menu
-            mItem = yui.YMGAMenuItem(_("&File"))
+            mItem = self.menubar.addMenu(_("&File"))
             self.fileMenu = {
                 'menu_name' : mItem,
-                'reset_sel' : yui.YMGAMenuItem(mItem, _("Reset the selection")),
-                'reload'    : yui.YMGAMenuItem(mItem, _("Refresh Metadata")),
-                'repos'     : yui.YMGAMenuItem(mItem, _("Repositories")),
-                'sep0'      : yui.YMenuSeparator(mItem),
-                'quit'      : yui.YMGAMenuItem(mItem, _("&Quit"), "application-exit"),
+                'reset_sel' : yui.YMenuItem(mItem, _("Reset the selection")),
+                'reload'    : yui.YMenuItem(mItem, _("Refresh Metadata")),
+                'repos'     : yui.YMenuItem(mItem, _("Repositories")),
+                'sep0'      : mItem.addSeparator(),
+                'quit'      : yui.YMenuItem(mItem, _("&Quit"), "application-exit"),
             }
             #Items must be "disowned"
             for k in self.fileMenu.keys():
                 self.fileMenu[k].this.own(False)
-            self.menubar.addItem(self.fileMenu['menu_name'])
 
-            # building Options menu
-            mItem = yui.YMGAMenuItem(_("&Information"))
+            # building Information menu
+            mItem = self.menubar.addMenu(_("&Information"))
             self.infoMenu = {
                 'menu_name' : mItem,
-                'history'   : yui.YMGAMenuItem(mItem, _("&History")),
+                'history'   : yui.YMenuItem(mItem, _("&History")),
             }
             #Items must be "disowned"
             for k in self.infoMenu.keys():
                 self.infoMenu[k].this.own(False)
-            self.menubar.addItem(self.infoMenu['menu_name'])
 
             # building Options menu
-            mItem = yui.YMGAMenuItem(_("&Options"))
+            mItem = self.menubar.addMenu(_("&Options"))
             self.optionsMenu = {
                 'menu_name'  : mItem,
-                'user_prefs' : yui.YMGAMenuItem(mItem, _("User preferences")),
+                'user_prefs' : yui.YMenuItem(mItem, _("User preferences")),
             }
             #Items must be "disowned"
             for k in self.optionsMenu.keys():
                 self.optionsMenu[k].this.own(False)
-            self.menubar.addItem(self.optionsMenu['menu_name'])
 
-            # build help menu
-            mItem = yui.YMGAMenuItem(_("&Help"))
+            # build Help menu
+            mItem = self.menubar.addMenu(_("&Help"))
             self.helpMenu = {
                 'menu_name': mItem,
-                'help'     : yui.YMGAMenuItem(mItem, _("Manual")),
-                'sep0'     : yui.YMenuSeparator(mItem),
-                'about'    : yui.YMGAMenuItem(mItem, _("&About"), 'dnfdragora'),
+                'help'     : yui.YMenuItem(mItem, _("Manual")),
+                'sep0'     : mItem.addSeparator(),
+                'about'    : yui.YMenuItem(mItem, _("&About"), 'dnfdragora'),
             }
             #Items must be "disowned"
             for k in self.helpMenu.keys():
                 self.helpMenu[k].this.own(False)
-            self.menubar.addItem(self.helpMenu['menu_name'])
         else:
             logger.info("System has not createMenuBar, using old menu buttons")
             self._createMenuButtons(self.factory.createHBox(self.factory.createLeft(hbox_menubar)))
