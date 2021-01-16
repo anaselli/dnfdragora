@@ -636,6 +636,9 @@ class mainGui(dnfdragora.basedragora.BaseDragora):
             #Items must be "disowned"
             for k in self.helpMenu.keys():
                 self.helpMenu[k].this.own(False)
+
+            self.menubar.resolveShortcutConflicts()
+            self.menubar.rebuildMenuTree()
         else:
             logger.info("System has not createMenuBar, using old menu buttons")
             self._createMenuButtons(self.factory.createHBox(self.factory.createLeft(hbox_menubar)))
