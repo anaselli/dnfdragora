@@ -441,17 +441,18 @@ class mainGui(dnfdragora.basedragora.BaseDragora):
         self.tree.setWeight(0,10)
         self.tree.setNotify(True)
 
-        packageList_header = yui.YTableHeader()
+        packageList_header = yui.YCBTableHeader()
         columns = [ _('Name'), _('Summary'), _('Version'), _('Release'), _('Arch'), _('Size')]
 
-        packageList_header.addColumn("")
+        checkboxed = True
+        packageList_header.addColumn("", checkboxed)
         for col in (columns):
-            packageList_header.addColumn(col)
+            packageList_header.addColumn(col, not checkboxed)
 
         if not self.update_only :
-            packageList_header.addColumn(_("Status"))
+            packageList_header.addColumn(_("Status"), not checkboxed)
 
-        self.packageList = self.mgaFactory.createCBTable(hbox_middle,packageList_header,yui.YCBTableCheckBoxOnFirstColumn)
+        self.packageList = self.mgaFactory.createCBTable(hbox_middle,packageList_header)
         self.packageList.setWeight(0,50)
         self.packageList.setImmediateMode(True)
 
