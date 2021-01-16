@@ -498,7 +498,7 @@ class mainGui(dnfdragora.basedragora.BaseDragora):
           view['show'] if 'show' in view.keys() else 'groups'
 
         for v in ordered_views:
-            item = yui.YItem(self.views[v]['title'], False)
+            item = yui.YItem(self.views[v]['title'])
             if show_item == v :
                 item.setSelected(True)
             # adding item to views to find the item selected
@@ -517,7 +517,7 @@ class mainGui(dnfdragora.basedragora.BaseDragora):
           else view['filter'] if 'filter' in view.keys() else 'all'
 
         for f in ordered_filters:
-            item = yui.YItem(self.filters[f]['title'], False)
+            item = yui.YItem(self.filters[f]['title'])
             if filter_item == f:
                 item.setSelected(True)
             # adding item to filters to find the item selected
@@ -540,7 +540,7 @@ class mainGui(dnfdragora.basedragora.BaseDragora):
         self.search_list = self.factory.createComboBox(hbox_top,"")
         itemColl.clear()
         for s in search_types:
-            item = yui.YItem(self.local_search_types[s]['title'], False)
+            item = yui.YItem(self.local_search_types[s]['title'])
             if s == search_types[0] :
                 item.setSelected(True)
             # adding item to local_search_types to find the item selected
