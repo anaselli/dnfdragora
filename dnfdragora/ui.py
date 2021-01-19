@@ -210,6 +210,7 @@ class mainGui(dnfdragora.basedragora.BaseDragora):
             'changelog' : { 'title' : _("Changelog"), 'show' : False },
             'requirements' : { 'title' : _("Requirements"), 'show' : False },
             }
+        self.checkBoxColumn = 0
         self.use_comps = False
         self.group_icon_path = None
         self.images_path = '/usr/share/dnfdragora/images/'
@@ -758,6 +759,26 @@ class mainGui(dnfdragora.basedragora.BaseDragora):
 
         return selected_pkg
 
+    def _createCBItem(self, checked, pkg_name, pkg_summary, pkg_version, pkg_release, pkg_arch, pkg_sizeM):
+        '''
+        create a YCBTableItem with given data and return it
+        Note that it also disowns either cells or item itself
+        '''
+        cells =  list([
+                      yui.YCBTableCell( checked ),
+                      yui.YCBTableCell( pkg_name ),
+                      yui.YCBTableCell( pkg_summary ),
+                      yui.YCBTableCell( pkg_version ),
+                      yui.YCBTableCell( pkg_release ),
+                      yui.YCBTableCell( pkg_arch ),
+                      yui.YCBTableCell( pkg_sizeM )
+                      ])
+        for cell in cells:
+            cell.this.own(False)
+        item = yui.YCBTableItem( *cells )
+        item.this.own(False)
+        return item
+
     def _fillPackageList(self, groupName=None, filter="all") :
         '''
         fill package list filtered by group if groupName is given,
@@ -788,19 +809,23 @@ class mainGui(dnfdragora.basedragora.BaseDragora):
                 if insert_items :
                     skip_insert = (filter == 'skip_other' and not (pkg.arch == 'noarch' or pkg.arch == platform.machine()))
                     if not skip_insert :
-                        item = yui.YCBTableItem(pkg.name , pkg.summary , pkg.version, pkg.release, pkg.arch, pkg.sizeM)
+                        item = self._createCBItem(self.packageQueue.checked(pkg),
+                                           pkg.name,
+                                           pkg.summary,
+                                           pkg.version,
+                                           pkg.release,
+                                           pkg.arch,
+                                           pkg.sizeM)
                         pkg_name = pkg.fullname
                         if sel_pkg :
                             if sel_pkg.fullname == pkg_name :
                                 item.setSelected(True)
-                        item.check(self.packageQueue.checked(pkg))
                         self.itemList[pkg_name] = {
                             'pkg' : pkg, 'item' : item
                             }
                         if not self.update_only:
                             item.addCell(" ")
                             self._setStatusToItem(pkg,item)
-                        item.this.own(False)
 
         if filter == 'all' or filter == 'installed' or filter == 'skip_other':
             installed = self.backend.get_packages('installed')
@@ -814,19 +839,23 @@ class mainGui(dnfdragora.basedragora.BaseDragora):
                 if insert_items :
                     skip_insert = (filter == 'skip_other' and not (pkg.arch == 'noarch' or pkg.arch == platform.machine()))
                     if not skip_insert :
-                        item = yui.YCBTableItem(pkg.name , pkg.summary , pkg.version, pkg.release, pkg.arch, pkg.sizeM)
+                        item = self._createCBItem(self.packageQueue.checked(pkg),
+                                           pkg.name,
+                                           pkg.summary,
+                                           pkg.version,
+                                           pkg.release,
+                                           pkg.arch,
+                                           pkg.sizeM)
                         pkg_name = pkg.fullname
                         if sel_pkg :
                             if sel_pkg.fullname == pkg_name :
                                 item.setSelected(True)
-                        item.check(self.packageQueue.checked(pkg))
                         self.itemList[pkg_name] = {
                             'pkg' : pkg, 'item' : item
                             }
                         if not self.update_only:
                             item.addCell(" ")
                             self._setStatusToItem(pkg,item)
-                        item.this.own(False)
 
         if filter == 'all' or filter == 'not_installed' or filter == 'skip_other':
             available = self.backend.get_packages('available')
@@ -840,19 +869,23 @@ class mainGui(dnfdragora.basedragora.BaseDragora):
                 if insert_items :
                     skip_insert = (filter == 'skip_other' and not (pkg.arch == 'noarch' or pkg.arch == platform.machine()))
                     if not skip_insert :
-                        item = yui.YCBTableItem(pkg.name , pkg.summary , pkg.version, pkg.release, pkg.arch, pkg.sizeM)
+                        item = self._createCBItem(self.packageQueue.checked(pkg),
+                                           pkg.name,
+                                           pkg.summary,
+                                           pkg.version,
+                                           pkg.release,
+                                           pkg.arch,
+                                           pkg.sizeM)
                         pkg_name = pkg.fullname
                         if sel_pkg :
                             if sel_pkg.fullname == pkg_name :
                                 item.setSelected(True)
-                        item.check(self.packageQueue.checked(pkg))
                         self.itemList[pkg_name] = {
                             'pkg' : pkg, 'item' : item
                             }
                         if not self.update_only:
                             item.addCell(" ")
                             self._setStatusToItem(pkg,item)
-                        item.this.own(False)
 
         keylist = sorted(self.itemList.keys())
         v = []
@@ -1151,19 +1184,23 @@ class mainGui(dnfdragora.basedragora.BaseDragora):
         if (filter == 'all' or (filter == 'to_update' and pkg.is_update ) or (filter == 'installed' and pkg.installed) or
             (filter == 'not_installed' and not pkg.installed) or
             (filter == 'skip_other' and (pkg.arch == 'noarch' or pkg.arch == platform.machine()))) :
-            item = yui.YCBTableItem(pkg.name , pkg.summary , pkg.version, pkg.release, pkg.arch, pkg.sizeM)
+            item = self._createCBItem(self.packageQueue.checked(pkg),
+                                           pkg.name,
+                                           pkg.summary,
+                                           pkg.version,
+                                           pkg.release,
+                                           pkg.arch,
+                                           pkg.sizeM)
             pkg_name = pkg.fullname
             if sel_pkg :
                 if sel_pkg.fullname == pkg_name :
                     item.setSelected(True)
-            item.check(self.packageQueue.checked(pkg))
             self.itemList[pkg_name] = {
                 'pkg' : pkg, 'item' : item
                 }
             if not self.update_only:
                 item.addCell(" ")
                 self._setStatusToItem(pkg,item)
-            item.this.own(False)
 
       keylist = sorted(self.itemList.keys())
       v = []
@@ -1452,7 +1489,7 @@ class mainGui(dnfdragora.basedragora.BaseDragora):
                                         dialogs.warningMsgBox({'title' : _("Protected package selected"), "text": _("Package %s cannot be removed")%pkg.name, "richtext":True})
                                         rebuild_package_list = self._rebuildPackageListWithSearchGroup()
                                     else :
-                                        if changedItem.checked():
+                                        if changedItem.checked(self.checkBoxColumn):
                                             self.packageQueue.add(pkg, 'i')
                                         else:
                                             self.packageQueue.add(pkg, 'r')
