@@ -585,17 +585,16 @@ class RepoDialog:
         hbox_bottom = self.factory.createHBox(vbox)
         hbox_footbar = self.factory.createHBox(vbox)
 
-        hbox_middle.setWeight(1,50)
-        hbox_bottom.setWeight(1,30)
-        hbox_footbar.setWeight(1,10)
+        hbox_middle.setWeight(yui.YD_VERT,50)
+        hbox_bottom.setWeight(yui.YD_VERT,30)
+        hbox_footbar.setWeight(yui.YD_VERT,10)
 
-        repoList_header = yui.YTableHeader()
-        columns = [ _('Name'), _("Enabled")]
+        checkboxed = True
+        repoList_header = yui.YCBTableHeader()
+        repoList_header.addColumn(_('Name'), not checkboxed)
+        repoList_header.addColumn(_('Enabled'), checkboxed)
 
-        for col in (columns):
-            repoList_header.addColumn(col)
-
-        self.repoList = self.mgaFactory.createCBTable(hbox_middle,repoList_header,yui.YCBTableCheckBoxOnLastColumn)
+        self.repoList = self.mgaFactory.createCBTable(hbox_middle,repoList_header)
         self.repoList.setImmediateMode(True)
 
         info_header = yui.YTableHeader()
@@ -609,27 +608,28 @@ class RepoDialog:
         #self.info.setWeight(1,40)
 
         self.applyButton = self.factory.createIconButton(hbox_footbar,"",_("&Apply"))
-        self.applyButton.setWeight(0,3)
+        self.applyButton.setWeight(yui.YD_HORIZ,3)
 
         self.quitButton = self.factory.createIconButton(hbox_footbar,"",_("&Cancel"))
-        self.quitButton.setWeight(0,3)
+        self.quitButton.setWeight(yui.YD_HORIZ,3)
         self.dialog.setDefaultButton(self.quitButton)
 
         self.itemList = {}
         # TODO fix the workaround when GetRepo(id) works again
         repos = self.backend.get_repo_ids("*")
+        enabled_repos = self.backend.get_repo_ids("enabled")
+
         for r in repos:
-            item = yui.YCBTableItem(r)
+            item = yui.YCBTableItem()
+            item.addCell(r)
+            enabled = r in enabled_repos
+            item.addCell(enabled)
+
             # TODO name from repo info
             self.itemList[r] = {
-                'item' : item, 'name': r, 'enabled' : False
+                'item' : item, 'name': r, 'enabled' : enabled
             }
             item.this.own(False)
-        enabled_repos = self.backend.get_repo_ids("enabled")
-        for r in enabled_repos:
-            if r in self.itemList.keys():
-                self.itemList[r]["enabled"] = True
-                self.itemList[r]["item"].check(True)
 
         keylist = sorted(self.itemList.keys())
         v = []
@@ -693,9 +693,10 @@ class RepoDialog:
                     if (wEvent.reason() == yui.YEvent.ValueChanged) :
                         changedItem = self.repoList.changedItem()
                         if changedItem :
+                            cell = changedItem.cellChanged()
                             for it in self.itemList:
                                 if (self.itemList[it]['item'] == changedItem) :
-                                    self.itemList[it]['enabled'] = changedItem.checked()
+                                    self.itemList[it]['enabled'] = cell.checked()
                     repo_id = self._selectedRepository()
                     s = "TODO show repo %s information<br> See https://github.com/timlau/dnf-daemon/issues/11"%(repo_id if repo_id else "---")
                     # TODO decide what and how to show when the crash https://github.com/timlau/dnf-daemon/issues/11 is fixed
